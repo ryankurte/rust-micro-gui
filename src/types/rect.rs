@@ -2,9 +2,10 @@
 //!
 //! Copyright 2017 Ryan Kurte
 
-/// Point in 2d space
-pub struct Point {
+/// Rectangle in 2d space
+pub struct Rect {
     pub x: usize,
     pub y: usize,
+    pub w: usize,
+    pub h: usize
 }
-
