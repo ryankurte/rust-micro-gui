@@ -18,7 +18,7 @@ impl Graphics {
     }
 
     /// Set wraps a buffer in a graphics context to shift rendering functions
-    pub fn set(&self, b: &mut buffer::BufferSet, x: usize, y: usize, p: pixel::Pixel) {
+    pub fn set(&self, b: &mut buffer::Set, x: usize, y: usize, p: &pixel::Pixel) {
         let new_x = self.x + x;
         let new_y = self.y + y;
 
@@ -28,7 +28,7 @@ impl Graphics {
     }
 
     /// Draws a line between two points with the provided pixel style
-    pub fn draw_line(&self, buf: &mut buffer::BufferSet, p1: point::Point, p2: point::Point, p: pixel::Pixel) {
+    pub fn draw_line(&self, buf: &mut buffer::Set, p1: point::Point, p2: point::Point, p: &pixel::Pixel) {
         // Bresenham's line algorithm (https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm), implementation from:
 	    // https://www.opengl.org/discussion_boards/showthread.php/168761-Drawing-Line-Bresenhem-midpoint-algorithm
 
@@ -76,7 +76,7 @@ impl Graphics {
     }
 
     /// Draws a rectange with the provided pixel style
-    pub fn draw_rect(&self, b: &mut buffer::BufferSet, r: rect::Rect, p: pixel::Pixel) {
+    pub fn draw_rect(&self, b: &mut buffer::Set, r: rect::Rect, p: &pixel::Pixel) {
         for x in r.x..r.w {
             self.set(b, x, r.y, p);
             self.set(b, x, r.y + r.h, p);
@@ -87,7 +87,7 @@ impl Graphics {
         }
     }
 
-    pub fn draw_ellipse(&self, buf: &mut buffer::BufferSet, r: rect::Rect, p: pixel::Pixel) {
+    pub fn draw_ellipse(&self, buf: &mut buffer::Set, r: rect::Rect, p: &pixel::Pixel) {
         // Implementation also from:
 	    // https://www.opengl.org/discussion_boards/showthread.php/168761-Drawing-Line-Bresenhem-midpoint-algorithm
 
@@ -143,6 +143,6 @@ impl Graphics {
         }
     }
 
-    //pub fn draw_sprite(&self, b: &mut buffer::BufferSet, p: &point::Point, s: &sprite::Sprite) { }
-    //pub fn draw_text(&self, b: &mut buffer::BufferSet, ) { }
+    //pub fn draw_sprite(&self, b: &mut buffer::Set, p: &point::Point, s: &sprite::Sprite) { }
+    //pub fn draw_text(&self, b: &mut buffer::Set, ) { }
 }

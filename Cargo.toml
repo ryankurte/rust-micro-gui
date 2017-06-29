@@ -3,4 +3,16 @@ name = "microgui"
 version = "0.1.0"
 authors = ["Ryan Kurte <ryankurte@gmail.com>"]
 
+[features]
+default = []
+
+sdl = []
+rgb24 = []
+
 [dependencies]
+    [dependencies.sdl2]
+    version = "0.30"
+    default-features = false
+    features = ["image"]
+
+[dev-dependencies]

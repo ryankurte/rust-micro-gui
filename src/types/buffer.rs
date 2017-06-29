@@ -1,11 +1,11 @@
 
 use types::*;
 
-pub trait BufferSet {
-    fn set(&mut self, x: usize, y: usize, p: pixel::Pixel);
+pub trait Set {
+    fn set(&mut self, x: usize, y: usize, p: &pixel::Pixel);
 }
 
-pub trait BufferGet {
+pub trait Get {
     fn get(&self, x: usize, y: usize) -> pixel::Pixel;
 }
 
