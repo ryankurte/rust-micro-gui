@@ -1,7 +1,6 @@
-//! Types module defines types for use across ugui implementation
-//! Pixel type is abstract and redefined based on requirements
+//! Pixel type definitions
 //! This is designed so that modules that do not need to interact with pixels directly
-//! can use pixel::Pixel and be compatible with all pixel representations
+//! can use pixel::Pixel or standard pixel traits and be compatible with all pixel representations.
 //!
 //! Copyright 2017 Ryan Kurte
 

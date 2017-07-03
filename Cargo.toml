@@ -5,14 +5,14 @@ authors = ["Ryan Kurte <ryankurte@gmail.com>"]
 
 [features]
 default = []
-
-sdl = []
 rgb24 = []
+
+sdl = ["sdl2"]
 
 [dependencies]
     [dependencies.sdl2]
     version = "0.30"
+    optional = true
     default-features = false
     features = ["image"]
 
-[dev-dependencies]

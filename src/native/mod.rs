@@ -1,6 +1,12 @@
+//! Native rendering module provides mechanisms for rendering ugui interfaces
+//! on standard computers using sdl2.
+//!
+//! Copyright 2017 Ryan Kurte
+
 
 use std::*;
 use std::sync::mpsc;
+use std::collections::HashSet;
 
 use types::*;
 use types::events::ID;
@@ -17,7 +23,8 @@ pub struct Renderer {
     context: sdl2::Sdl,
     canvas: render::WindowCanvas,
     pub event_rx: mpsc::Receiver<events::Event>,
-    event_tx: mpsc::Sender<events::Event>
+    event_tx: mpsc::Sender<events::Event>,
+    prev_buttons: HashSet<mouse::MouseButton>
 }
 
 impl Renderer {
@@ -35,7 +42,9 @@ impl Renderer {
 
         let (event_tx, event_rx): (mpsc::Sender<events::Event>, mpsc::Receiver<events::Event>) = mpsc::channel();
 
-        return Renderer{w, h, context, canvas, event_rx, event_tx};
+        let mut prev_buttons = HashSet::new();
+
+        return Renderer{w, h, context, canvas, event_rx, event_tx, prev_buttons};
     }
 
     /// Update should be run in the main loop
@@ -43,7 +52,10 @@ impl Renderer {
     pub fn update(&mut self) -> bool {
         let mut running = true;
 
-        for event in self.context.event_pump().unwrap().poll_iter() {
+        let mut sdl_events = self.context.event_pump().unwrap();
+
+        // Handle keyboard events
+        for event in sdl_events.poll_iter() {
             match event {
                 Event::KeyDown { keycode: Some(Keycode::Escape), .. } |
                 Event::Quit { .. } => { running = false; },
@@ -56,6 +68,22 @@ impl Renderer {
                 _ => {}
             }
         }
+
+        // Handle mouse events
+        let state = sdl_events.mouse_state();
+
+        // Create a set of pressed Keys.
+        let buttons = state.pressed_mouse_buttons().collect();
+
+        // Get the difference between the new and old sets.
+        let new_buttons = &buttons - &self.prev_buttons;
+        let old_buttons = &self.prev_buttons - &buttons;
+
+        if !new_buttons.is_empty() && old_buttons.is_empty() {
+            self.event_tx.send(events::Event{id: ID::Click, x: state.x() as usize, y: state.y() as usize}).unwrap();
+        }
+
+        self.prev_buttons = buttons;
         
         return running;
     }

@@ -1,3 +1,8 @@
+//! Graphics module provides underlying rendering functions over a generic buffer
+//! This is used by components or widgets for rendering purposes.
+//!
+//! Copyright 2017 Ryan Kurte
+
 
 use types::*;
 

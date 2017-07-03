@@ -1,3 +1,8 @@
+//! ugui example application
+//!
+//! Copyright 2017 Ryan Kurte
+
+
 extern crate microgui;
 
 use microgui::types::*;
@@ -39,6 +44,10 @@ fn main() {
     loop {
         renderer.render(buffer.data);
         let running = renderer.update();
+
+        for e in renderer.event_rx.try_iter() {
+            println!("Event: {:?}", e);
+        }
 
         if !running { break; }
     }
