@@ -42,7 +42,7 @@ impl Renderer {
 
         let (event_tx, event_rx): (mpsc::Sender<events::Event>, mpsc::Receiver<events::Event>) = mpsc::channel();
 
-        let mut prev_buttons = HashSet::new();
+        let prev_buttons = HashSet::new();
 
         return Renderer{w, h, context, canvas, event_rx, event_tx, prev_buttons};
     }
