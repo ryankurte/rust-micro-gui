@@ -5,11 +5,11 @@
 
 extern crate microgui;
 
-use microgui::types::*;
-use microgui::types::pixel::*;
+use microgui::GUI;
 use microgui::buffer::Buffer;
 use microgui::native::Renderer;
-use microgui::graphics::Graphics;
+use microgui::window::Window;
+use microgui::widgets::demo::DemoWidget;
 
 const WIDTH: usize = 640;
 const HEIGHT: usize = 480; 
@@ -25,27 +25,28 @@ fn main() {
     // Create buffer to wrap data
     let mut buffer = Buffer::new(WIDTH, HEIGHT, 0, 0, data_slice);
 
-    // Create graphics rendering interface
-    let graphics = Graphics::new(0, 0, WIDTH, HEIGHT);
+    let mut demo = DemoWidget::new();
+    let mut window = Window::new(WIDTH, HEIGHT, Some(&mut demo));
 
-    //graphics.draw_line(&mut buffer, point::Point{x: 0, y: 0}, point::Point{x: WIDTH, y: HEIGHT}, &pixel::Pixel::black());
-    //graphics.draw_line(&mut buffer, point::Point{x: 0, y: HEIGHT}, point::Point{x: WIDTH, y: 0}, &pixel::Pixel::black());
+    // Create gui instance that consumes buffer
+    let mut gui = GUI::new(WIDTH, HEIGHT);
 
-    let ellipse_r = WIDTH/4;
-    graphics.draw_ellipse(&mut buffer, rect::Rect{x: (WIDTH-ellipse_r)/2 - ellipse_r/5*3, y: (HEIGHT-ellipse_r)/2, w: ellipse_r, h: ellipse_r}, &pixel::Pixel::red());
-    graphics.draw_ellipse(&mut buffer, rect::Rect{x: (WIDTH-ellipse_r)/2, y: (HEIGHT-ellipse_r)/2, w: ellipse_r, h: ellipse_r}, &pixel::Pixel::green());
-    graphics.draw_ellipse(&mut buffer, rect::Rect{x: (WIDTH-ellipse_r)/2 + ellipse_r/5*3, y: (HEIGHT-ellipse_r)/2, w: ellipse_r, h: ellipse_r}, &pixel::Pixel::blue());
+    gui.push_window(&mut window);
+
+    
 
     // Native renderer allows local display
-    let mut renderer = Renderer::new(&"Rust microgui example", WIDTH as u32, HEIGHT as u32);
+    let mut native = Renderer::new(&"Rust microgui example", WIDTH as u32, HEIGHT as u32);
 
-    println!("Rust microgui running");
+    println!("Rust microgui running!");
 
     loop {
-        renderer.render(buffer.data);
-        let running = renderer.update();
+        gui.render(&mut buffer);
+        native.render(buffer.data);
 
-        for e in renderer.event_rx.try_iter() {
+        let running = native.update();
+        for e in native.event_rx.try_iter() {
+            gui.event(&e);
             println!("Event: {:?}", e);
         }
 

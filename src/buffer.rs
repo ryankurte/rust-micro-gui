@@ -79,10 +79,28 @@ impl <'a>Buffer<'a> {
                                  g: self.data[index + 1],
                                  b: self.data[index + 2]} 
     }
+
+    /// Black and White mode buffer clear function
+    fn clear_bw(&mut self) {
+        for y in 0..self.height {
+            for x in self.porch_bytes..self.width/8 {
+                self.data[y * self.line_width_bytes + x] = 0x00;
+            }
+        }
+    }  
+
+    /// RGB24 mode buffer clear function
+    fn clear_rgb24(&mut self) {
+        for y in 0..self.height {
+            for x in self.porch_bytes..self.width*3+self.porch_bytes {
+                self.data[y * self.line_width_bytes + x] = 0xFF;
+            }
+        }
+    } 
 }
 
 /// Set pixel implementation for the buffer
-impl <'a>buffer::Set for Buffer<'a> {
+impl <'a>buffer::Buff for Buffer<'a> {
     /// B/W mode pixel set function
     #[cfg(not(any(feature="rgb24")))]
     fn set(&mut self, x: usize, y: usize, p: &pixel::PixelBW) { self.set_bw(x, y, p) }
@@ -90,10 +108,7 @@ impl <'a>buffer::Set for Buffer<'a> {
     /// RGB mode pixel set function
     #[cfg(feature="rgb24")]
     fn set(&mut self, x: usize, y: usize, p: &pixel::PixelRGB24) { self.set_rgb24(x, y, p) }
-}
 
-/// Get pixel implementation for the buffer
-impl <'a>buffer::Get for Buffer<'a> {
     /// B/W mode pixel get function
     #[cfg(not(any(feature="rgb24")))]
     fn get(&self, x: usize, y: usize) -> pixel::PixelBW { self.get_bw(x, y) }  
@@ -101,7 +116,21 @@ impl <'a>buffer::Get for Buffer<'a> {
     /// RGB mode pixel set function
     #[cfg(feature="rgb24")]
     fn get(&self, x: usize, y: usize) -> pixel::PixelRGB24 { self.get_rgb24(x, y) }
+
+    /// Fetch the buffer size in pixels
+    fn size(&self) -> (usize, usize) {
+        return (self.width, self.height);
+    }
+
+    /// B/W mode buffer clear function
+    #[cfg(not(any(feature="rgb24")))]
+    fn clear(&mut self) { self.clear_bw() }
+
+    /// RGB mode buffer clear function
+    #[cfg(feature="rgb24")]
+    fn clear(&mut self) { self.clear_rgb24() }
 }
+
 
 /// Format implementation for the buffer
 impl <'a>fmt::Display for Buffer<'a> {

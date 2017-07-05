@@ -5,14 +5,14 @@
 
 use types::*;
 
-pub trait Set {
+/// Buff trait encompasses methods required by implementing buffers
+pub trait Buff {
+    /// Set trait sets a pixel in the buffer
     fn set(&mut self, x: usize, y: usize, p: &pixel::Pixel);
-}
-
-pub trait Get {
+    /// Get trait fetches a pixel in a buffer
     fn get(&self, x: usize, y: usize) -> pixel::Pixel;
-}
-
-pub trait Size {
+    /// Size trait fetches the size of a buffer (in pixels)
     fn size(&self) -> (usize, usize);
+    /// Clear clears the buffer
+    fn clear(&mut self);
 }

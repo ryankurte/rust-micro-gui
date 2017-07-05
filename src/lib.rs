@@ -8,50 +8,68 @@ pub mod layer;
 pub mod window;
 use window::*;
 
-pub mod graphics;
 pub mod buffer;
+
+pub mod graphics;
+use graphics::*;
+
+pub mod widgets;
 
 #[cfg(feature = "sdl")]
 pub mod native;
 
-pub struct GUI {
-    windows: vec::Vec<&'static mut window::Window<'static>>
+/// Top level GUI object
+pub struct GUI<'a> {
+    graphics: Graphics,
+    windows: vec::Vec<&'a mut window::Window<'a>>
 }
 
-impl GUI {
-    pub fn new(w: usize, h: usize) -> GUI {
+impl <'a> GUI <'a> {
+    /// Create a new GUI instance of the provided size with the specified buffer
+    pub fn new(w: usize, h: usize) -> GUI<'a> {
+        let graphics = Graphics::new(0, 0, w, h);
         let windows = Vec::new();
 
-        return GUI{windows: windows};
+        return GUI{graphics, windows};
     }
 
-    pub fn push(&mut self, w: &'static mut window::Window) {
+    /// Push a window to the top of the window stack
+    /// This will cause the window to be rendered
+    pub fn push_window(&mut self, w: &'a mut window::Window<'a>) {
         w.on_load();
         self.windows.push(w);
     }
 
-    pub fn pop(&mut self) {
-        match self.windows.pop() {
+    /// Pop a window from the top of the window stack
+    /// This will cause the previous window to be re-rendered
+    pub fn pop_window(&mut self) -> Option<&mut window::Window<'a>> {
+        let mut window = self.windows.pop();
+        match window {
             Some(ref mut w) => w.on_unload(),
             None => ()
         }
+        return window;
     }
 
-    pub fn render(&mut self) {
-        if self.windows.len() == 0 {
-            return;
-        }
+    /// Render will render the current window
+    pub fn render(&mut self, buff: &mut types::buffer::Buff) {
+        buff.clear();
 
         let mut windows = self.windows.as_mut_slice();
-        let len = windows.len() - 1;
-        let mut active = &mut windows[len];
-        active.render();
+        let len = windows.len();
+        if len <= 0 { return; }
+
+        let mut active = &mut windows[len-1];
+        active.render(&mut self.graphics, buff);
     }
 
-    pub fn send(&mut self, e: &events::Event) {
+    /// Event passes a ugui event to the current window
+    pub fn event(&mut self, e: &events::Event) {
         let mut windows = self.windows.as_mut_slice();
-        let len = windows.len() - 1;
-        let mut active = &mut windows[len];
+        let len = windows.len();
+        if len <= 0 { return; }
+
+        let mut active = &mut windows[len-1];
         active.on_event(e);
     }
 }

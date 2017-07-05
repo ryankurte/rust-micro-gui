@@ -1,48 +1,64 @@
 
-
+use std::*;
 
 use types::*;
+use graphics::{Graphics, Renderable};
 
-pub trait Update {
-    fn update(&mut self) -> bool;
-}
-
+/// Layers combine graphics functions to provide reusable blocks for rendering
 pub struct Layer<'a> {
     bounds: rect::Rect,
-    dirty: bool,
     visible: bool,
-    update: Option<&'a mut (Update + 'a)>
+    renderer: Option<&'a mut (Renderable + 'a)>,
+    children: vec::Vec<&'a mut Layer<'a>>
 }
 
-
 impl <'a>Layer<'a> {
-    pub fn new(bounds: rect::Rect) -> Layer<'a> {
-        return Layer{bounds: bounds, dirty: false, visible: true, update: None};
+    /// Create a new layer with the provided bounds
+    pub fn new(bounds: rect::Rect, renderer: Option<&'a mut (Renderable + 'a)>) -> Layer<'a> {
+        return Layer{bounds: bounds, visible: true, renderer, children: Vec::new()};
     }
 
+    /// Fetch the bounds of a given layer
     pub fn bounds(&self) -> rect::Rect {
         return self.bounds;
     }
 
-    pub fn bind_update(&mut self, update: &'a mut Update) {
-        self.update = Some(update);
-    }
-
-    pub fn set_dirty(&mut self) {
-        self.dirty = true;
-    }
-
+    /// Set layer visible state
     pub fn set_visible(&mut self, visible: bool) {
         self.visible = visible;
     }
+}
 
-    pub fn update(&mut self) {
+impl <'a>Renderable for Layer<'a> {
+    /// Render a layer using the provided graphics context and buffer
+    fn render(&mut self, graphics: &mut Graphics, buffer: &mut buffer::Buff) {
+
         if !self.visible {
             return;
         }
-        self.dirty = match self.update {
-            Some(ref mut u) => u.update(),
-            None => false
+
+        // Update graphics context with new layer bounds
+        let gfx_bounds = graphics.get_bounds();
+        let mut new_bounds = gfx_bounds;
+        new_bounds.x += self.bounds.x;
+        new_bounds.y += self.bounds.y;
+        new_bounds.w = if gfx_bounds.w > self.bounds.w { self.bounds.w } else { gfx_bounds.w };
+        new_bounds.h = if gfx_bounds.h > self.bounds.h { self.bounds.h } else { gfx_bounds.h };
+        graphics.set_bounds(&new_bounds);
+
+        // Render children
+        for child in self.children.iter_mut() {
+            child.render(graphics, buffer);
         }
+
+        // Render parent
+        match self.renderer {
+            Some(ref mut r) => r.render(graphics, buffer),
+            None => ()
+        }
+
+        // Revert graphics context
+        graphics.set_bounds(&gfx_bounds);
+
     }
 }
