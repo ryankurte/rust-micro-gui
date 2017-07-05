@@ -50,9 +50,9 @@ impl BW for PixelRGB24 {
 }
 
 impl RGB for PixelRGB24 {
-    fn red()   -> PixelRGB24 { PixelRGB24{r: 0xff, g: 0x00, b: 0x00} }
-    fn green() -> PixelRGB24 { PixelRGB24{r: 0x00, g: 0xff, b: 0x00} }
-    fn blue()  -> PixelRGB24 { PixelRGB24{r: 0x00, g: 0x00, b: 0xff} }
+    fn red()   -> PixelRGB24 { PixelRGB24::nice_red() }
+    fn green() -> PixelRGB24 { PixelRGB24::nice_green() }
+    fn blue()  -> PixelRGB24 { PixelRGB24::nice_blue() }
 }
 
 
@@ -62,6 +62,12 @@ pub type PixelBW = bool;
 impl BW for PixelBW {
     fn black() -> PixelBW { true }
     fn white() -> PixelBW { false }
+}
+
+impl RGB for PixelBW {
+    fn red()   -> PixelBW { true }
+    fn green() -> PixelBW { true }
+    fn blue()  -> PixelBW { true }
 }
 
 // Magic mapping so pixel::Pixel should be usable everywhere else

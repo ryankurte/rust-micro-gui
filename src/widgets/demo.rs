@@ -38,15 +38,15 @@ impl Renderable for DemoWidget {
             Rect{x: (bounds.w-ellipse_r)/2, y: (bounds.h-ellipse_r)/2, w: ellipse_r, h: ellipse_r},
             Rect{x: (bounds.w-ellipse_r)/2 + ellipse_r/5*3, y: (bounds.h-ellipse_r)/2, w: ellipse_r, h: ellipse_r}
         ];
-        graphics.draw_ellipse(buffer, circles[0], &PixelRGB24::nice_red());
-        graphics.draw_ellipse(buffer, circles[1], &PixelRGB24::nice_green());
-        graphics.draw_ellipse(buffer, circles[2], &PixelRGB24::nice_blue());
+        graphics.draw_ellipse(buffer, circles[0], &Pixel::red());
+        graphics.draw_ellipse(buffer, circles[1], &Pixel::green());
+        graphics.draw_ellipse(buffer, circles[2], &Pixel::blue());
 
         // Rectangles
-        graphics.draw_rect(buffer, Rect::new(bounds.w/7*1-16, bounds.h/8*6-16, bounds.w/7*5+32, bounds.h/6+32), &PixelRGB24::black());
-        graphics.fill_rect(buffer, Rect::new(bounds.w/7*1, bounds.h/8*6, bounds.w/7, bounds.h/6), &PixelRGB24::nice_red());
-        graphics.fill_rect(buffer, Rect::new(bounds.w/7*3, bounds.h/8*6, bounds.w/7, bounds.h/6), &PixelRGB24::nice_green());
-        graphics.fill_rect(buffer, Rect::new(bounds.w/7*5, bounds.h/8*6, bounds.w/7, bounds.h/6), &PixelRGB24::nice_blue());
+        graphics.draw_rect(buffer, Rect::new(bounds.w/7*1-16, bounds.h/8*6-16, bounds.w/7*5+32, bounds.h/6+32), &Pixel::black());
+        graphics.fill_rect(buffer, Rect::new(bounds.w/7*1, bounds.h/8*6, bounds.w/7, bounds.h/6), &Pixel::red());
+        graphics.fill_rect(buffer, Rect::new(bounds.w/7*3, bounds.h/8*6, bounds.w/7, bounds.h/6), &Pixel::green());
+        graphics.fill_rect(buffer, Rect::new(bounds.w/7*5, bounds.h/8*6, bounds.w/7, bounds.h/6), &Pixel::blue());
 
     }
 }
