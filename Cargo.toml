@@ -20,3 +20,8 @@ optional = true
 default-features = false
 features = ["image"]
 
+[[bin]]
+name = "micro-gui-example"
+path = "src/bin/example.rs"
+required-features = [ "sdl2" ]
+
