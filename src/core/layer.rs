@@ -1,25 +1,26 @@
 
 use std::*;
 
-use types::*;
+use core::buffer::Buff;
+use types::rect::Rect;
 use graphics::{Graphics, Renderable};
 
 /// Layers combine graphics functions to provide reusable blocks for rendering
-pub struct Layer<'a> {
-    bounds: rect::Rect,
+pub struct Layer<'a, Pixel> {
+    bounds: Rect,
     visible: bool,
-    renderer: Option<&'a mut (Renderable + 'a)>,
-    children: vec::Vec<&'a mut Layer<'a>>
+    renderer: Option<&'a mut (Renderable<Pixel> + 'a)>,
+    children: vec::Vec<&'a mut Layer<'a, Pixel>>
 }
 
-impl <'a>Layer<'a> {
+impl <'a, Pixel>Layer<'a, Pixel> {
     /// Create a new layer with the provided bounds
-    pub fn new(bounds: rect::Rect, renderer: Option<&'a mut (Renderable + 'a)>) -> Layer<'a> {
+    pub fn new(bounds: Rect, renderer: Option<&'a mut (Renderable<Pixel> + 'a)>) -> Layer<'a, Pixel> {
         return Layer{bounds: bounds, visible: true, renderer, children: Vec::new()};
     }
 
     /// Fetch the bounds of a given layer
-    pub fn bounds(&self) -> rect::Rect {
+    pub fn bounds(&self) -> Rect {
         return self.bounds;
     }
 
@@ -29,9 +30,9 @@ impl <'a>Layer<'a> {
     }
 }
 
-impl <'a>Renderable for Layer<'a> {
+impl <'a, Pixel>Renderable<Pixel> for Layer<'a, Pixel> {
     /// Render a layer using the provided graphics context and buffer
-    fn render(&mut self, graphics: &mut Graphics, buffer: &mut buffer::Buff) {
+    fn render(&mut self, graphics: &mut Graphics<Pixel>, buffer: &mut Buff<Pixel>) {
 
         if !self.visible {
             return;

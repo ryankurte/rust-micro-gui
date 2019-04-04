@@ -3,39 +3,45 @@
 //!
 //! Copyright 2017 Ryan Kurte
 
-use types::*;
 
+use std::marker::PhantomData;
+
+
+use core::buffer::Buff;
+use types::rect::Rect;
+use types::point::Point;
 
 /// Renderable trait implemented by types that can render themselves
 /// For example, widgets should implement the renderable trait to be bound into layers
-pub trait Renderable {
-    fn render(&mut self, graphics: &mut Graphics, buffer: &mut buffer::Buff);
+pub trait Renderable<Pixel> {
+    fn render(&mut self, graphics: &mut Graphics<Pixel>, buffer: &mut Buff<Pixel>);
 }
 
 /// Sprite trait implemented by types that can be rendered from a buffer
-pub trait Sprite {
-    fn get(&mut self, x: usize, y: usize) -> &pixel::Pixel;
+pub trait Sprite<Pixel> {
+    fn get(&mut self, x: usize, y: usize) -> &Pixel;
     fn size(&self) -> (usize, usize);
 }
 
 
 /// Graphics context used for rendering components
 /// This includes offsets and dimensions to shift rendering scopes
-pub struct Graphics {
+pub struct Graphics<Pixel> {
     x: usize,
     y: usize,
     w: usize,
-    h: usize
+    h: usize,
+    _pixel: PhantomData<Pixel>,
 }
 
-impl Graphics {
+impl <Pixel>Graphics<Pixel> {
     /// New creates a new graphcs context with the provided offsets and limits
-    pub fn new(x: usize, y: usize, w: usize, h: usize) -> Graphics {
-        return Graphics{x, y, w, h};
+    pub fn new(x: usize, y: usize, w: usize, h: usize) -> Self {
+        return Self{x, y, w, h, _pixel: PhantomData};
     }
 
     /// Set wraps a buffer in a graphics context to shift rendering functions
-    pub fn set(&self, b: &mut buffer::Buff, x: usize, y: usize, p: &pixel::Pixel) {
+    pub fn set(&self, b: &mut Buff<Pixel>, x: usize, y: usize, p: &Pixel) {
         let new_x = self.x + x;
         let new_y = self.y + y;
 
@@ -44,13 +50,13 @@ impl Graphics {
         }
     }
 
-    pub fn get_bounds(&mut self) -> rect::Rect {
-        return rect::Rect::new(self.x, self.y, self.w, self.h);
+    pub fn get_bounds(&mut self) -> Rect {
+        return Rect::new(self.x, self.y, self.w, self.h);
     }
 
     /// Set new bounds for rendering
     /// This will offset and limit rendering by the provided values.
-    pub fn set_bounds(&mut self, bounds: &rect::Rect) {
+    pub fn set_bounds(&mut self, bounds: &Rect) {
         self.x = bounds.x;
         self.y = bounds.y;
         self.w = bounds.w;
@@ -64,7 +70,7 @@ impl Graphics {
     }
 
     /// Draws a line between two points with the provided pixel style
-    pub fn draw_line(&self, buf: &mut buffer::Buff, p1: point::Point, p2: point::Point, p: &pixel::Pixel) {
+    pub fn draw_line(&self, buf: &mut Buff<Pixel>, p1: Point, p2: Point, p: &Pixel) {
         // Bresenham's line algorithm (https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm), implementation from:
 	    // https://www.opengl.org/discussion_boards/showthread.php/168761-Drawing-Line-Bresenhem-midpoint-algorithm
 
@@ -124,7 +130,7 @@ impl Graphics {
     }
 
     /// Draws a rectange with the provided pixel style
-    pub fn draw_rect(&self, b: &mut buffer::Buff, r: rect::Rect, p: &pixel::Pixel) {
+    pub fn draw_rect(&self, b: &mut Buff<Pixel>, r: Rect, p: &Pixel) {
         for x in 0..r.w {
             self.set(b, r.x + x, r.y, p);
             self.set(b, r.x + x, r.y + r.h, p);
@@ -136,7 +142,7 @@ impl Graphics {
     }
 
     /// Draws a rectangle with the provided pixel style
-    pub fn fill_rect(&self, b: &mut buffer::Buff, r: rect::Rect, p: &pixel::Pixel) {
+    pub fn fill_rect(&self, b: &mut Buff<Pixel>, r: Rect, p: &Pixel) {
         for y in 0..r.h {
             for x in 0..r.w {
                 self.set(b, r.x + x, r.y + y, p);
@@ -145,7 +151,7 @@ impl Graphics {
     }
 
     /// Draws a polyline connecting a list of points
-    pub fn draw_polyline(&self, b: &mut buffer::Buff, points: &[point::Point], p: &pixel::Pixel) {
+    pub fn draw_polyline(&self, b: &mut Buff<Pixel>, points: &[Point], p: &Pixel) {
         let len = points.len();
         for i in 0..len-1 {
             let p1 = points[i];
@@ -155,7 +161,7 @@ impl Graphics {
     }
 
     /// Draws an ellipse to fill the provided rectangle
-    pub fn draw_ellipse(&self, buf: &mut buffer::Buff, r: rect::Rect, p: &pixel::Pixel) {
+    pub fn draw_ellipse(&self, buf: &mut Buff<Pixel>, r: Rect, p: &Pixel) {
         // Implementation also from:
 	    // https://www.opengl.org/discussion_boards/showthread.php/168761-Drawing-Line-Bresenhem-midpoint-algorithm
 
@@ -211,6 +217,6 @@ impl Graphics {
         }
     }
 
-    //pub fn draw_sprite(&self, b: &mut buffer::Buff, p: &point::Point, s: &sprite::Sprite) { }
-    //pub fn draw_text(&self, b: &mut buffer::Buff, ) { }
+    //pub fn draw_sprite(&self, b: &mut Buff<Pixel>, p: &point::Point, s: &sprite::Sprite) { }
+    //pub fn draw_text(&self, b: &mut Buff<Pixel>, ) { }
 }

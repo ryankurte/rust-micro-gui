@@ -3,19 +3,16 @@
 //! Copyright 2017 Ryan Kurte
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum ID {
+pub enum Event {
     Up,
     Down,
     Left,
     Right,
     Select,
     Back,
-    Click
+    Click{
+        x: usize,
+        y: usize,
+    },
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub struct Event {
-    pub id: ID,
-    pub x: usize,
-    pub y: usize
-}

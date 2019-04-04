@@ -1,8 +1,9 @@
 
+use core::buffer::Buff;
+
 use types::pixel::*;
 use types::rect::Rect;
 use types::point::Point;
-use types::buffer::Buff;
 use graphics::{Graphics, Renderable};
 
 pub struct DemoWidget {
@@ -15,8 +16,11 @@ impl DemoWidget {
     }
 }
 
-impl Renderable for DemoWidget {
-    fn render(&mut self, graphics: &mut Graphics, buffer: &mut Buff) {
+impl <Pixel>Renderable<Pixel> for DemoWidget 
+where
+    Pixel: BW + RGB,
+{
+    fn render(&mut self, graphics: &mut Graphics<Pixel>, buffer: &mut Buff<Pixel>) {
         let bounds = graphics.get_bounds();
 
         // Lines

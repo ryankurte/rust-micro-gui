@@ -5,13 +5,17 @@
 
 use std::*;
 
+
 use types::*;
-use layer::*;
-use graphics::*;
+
+use super::buffer::Buff;
+use super::layer::Layer;
+
+use graphics::{Graphics, Renderable};
 
 /// Window object contains renderable layers and handles events
-pub struct Window<'a> {
-    base: Layer<'a>,
+pub struct Window<'a, Pixel> {
+    base: Layer<'a, Pixel>,
     on_load: Option<&'a mut (OnLoad + 'a)>,
     on_unload: Option<&'a mut (OnUnload + 'a)>,
     on_event: Option<&'a mut (OnEvent + 'a)>
@@ -29,13 +33,13 @@ pub trait OnUnload {
 
 /// OnEvent trait called to receive an event
 pub trait OnEvent {
-    fn on_event(&mut self, e: &events::Event);
+    fn on_event(&mut self, e: &Event);
 }
 
-impl <'a>Window<'a> {
+impl <'a, Pixel>Window<'a, Pixel> {
     /// Create a new window for rendering
-    pub fn new(w: usize, h: usize, renderer: Option<&'a mut (Renderable + 'a)>) -> Window<'a> {
-        let bounds = rect::Rect::new(0, 0, w, h);
+    pub fn new(w: usize, h: usize, renderer: Option<&'a mut (Renderable<Pixel> + 'a)>) -> Self {
+        let bounds = Rect::new(0, 0, w, h);
         let base = Layer::new(bounds, renderer);
         return Window{base: base, on_load: None, on_event: None, on_unload: None}
     }
@@ -48,12 +52,12 @@ impl <'a>Window<'a> {
     }
 
     /// Render the layer
-    pub fn render(&mut self, graphics: &mut Graphics, buffer: &mut buffer::Buff) {
+    pub fn render(&mut self, graphics: &mut Graphics<Pixel>, buffer: &mut Buff<Pixel>) {
         self.base.render(graphics, buffer);
     }
 }
 
-impl <'a>OnLoad for Window<'a> {
+impl <'a, Pixel>OnLoad for Window<'a, Pixel> {
     fn on_load(&mut self) {
         match self.on_load {
             Some(ref mut h) => h.on_load(),
@@ -62,7 +66,7 @@ impl <'a>OnLoad for Window<'a> {
     }
 }
 
-impl <'a>OnUnload for Window<'a> {
+impl <'a, Pixel>OnUnload for Window<'a, Pixel> {
     fn on_unload(&mut self) {
         match self.on_unload {
             Some(ref mut h) => h.on_unload(),
@@ -71,7 +75,7 @@ impl <'a>OnUnload for Window<'a> {
     }
 }
 
-impl <'a>OnEvent for Window<'a> {
+impl <'a, Pixel>OnEvent for Window<'a, Pixel> {
     fn on_event(&mut self, e: &events::Event) {
         match self.on_event {
             Some(ref mut h) => h.on_event(e),
