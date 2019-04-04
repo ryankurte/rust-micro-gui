@@ -101,30 +101,37 @@ impl Renderer {
     /// Render a black and white image
     #[cfg(not(any(feature="rgb24")))]
     pub fn render(&mut self, pixels: &[u8]) {
-        let size = (self.w * self.h * 4) as usize;
+        let data = Self::bw_to_rgba32(self.w as usize, self.h as usize, pixels);
+
+        self.render_common(data.as_slice()); 
+    }
+
+    fn bw_to_rgba32(w: usize, h: usize, pixels: &[u8]) -> Vec<u8> {
+        let size = (w * h * 4);
         let mut data: Vec<u8> = vec![0; size];
 
-        for y in 0..self.h {
-            for x in 0..self.w {
-                let pixel_index = (y * self.w + x / 8) as usize;
-                let pixel_mask = (x % 8) as u8;
-                let data_index = ((y * self.w + x) * 4) as usize;
+        for y in 0..h {
+            let i = y * w / 8;
+            let row = &pixels[i .. i + w / 8];
 
-                if pixels[pixel_index] & pixel_mask == 0 {
-                    data[data_index+0] = 0;
-                    data[data_index+1] = 0;
-                    data[data_index+2] = 0;
-                    data[data_index+3] = 0;
+            for x in 0..w {
+                let pixel_index = x / 8 as usize;
+                let pixel_mask = 1 << (7-(x % 8));
+                let data_index = (y * w + x) * 4 as usize;
+
+                let m = if row[pixel_index] & pixel_mask != 0 {
+                    0xFF
                 } else {
-                    data[data_index+0] = 255;
-                    data[data_index+1] = 255;
-                    data[data_index+2] = 255;
-                    data[data_index+3] = 255;
+                    0x00
+                };
+                
+                for i in 0..4 {
+                    data[data_index + i] = m;
                 }
             }
         }
 
-        self.render_common(data.as_slice()); 
+        data
     }
 
     /// Render an rgb24 (8,8,8) encoded image
@@ -152,5 +159,25 @@ impl Renderer {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
+    #[test]
+    fn test_bw_to_rgba32() {
+        let pixels = [
+            0b1000_0001, 
+            0b0100_0010,
+        ];
+        let expected = [
+            0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+            0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00,
+        ].to_vec();
+
+
+        let mapped = Renderer::bw_to_rgba32(8, 2, &pixels);
+
+        assert_eq!(expected.len(), mapped.len());
+        assert_eq!(expected, mapped);
+    }
 }

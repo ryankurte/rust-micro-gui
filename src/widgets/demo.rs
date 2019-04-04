@@ -20,6 +20,7 @@ impl Renderable for DemoWidget {
         let bounds = graphics.get_bounds();
 
         // Lines
+        graphics.draw_line(buffer, Point{x: 20, y: 20}, Point{x: bounds.w - 20, y: 20}, &Pixel::black());
         graphics.draw_line(buffer, Point{x: 0, y: 0}, Point{x: bounds.w, y: bounds.h}, &Pixel::black());
         graphics.draw_line(buffer, Point{x: 0, y: bounds.h}, Point{x: bounds.w, y: 0}, &Pixel::black());
 
@@ -49,4 +50,5 @@ impl Renderable for DemoWidget {
         graphics.fill_rect(buffer, Rect::new(bounds.w/7*5, bounds.h/8*6, bounds.w/7, bounds.h/6), &Pixel::blue());
 
     }
+
 }

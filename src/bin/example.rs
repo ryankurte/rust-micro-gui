@@ -3,13 +3,13 @@
 //! Copyright 2017 Ryan Kurte
 
 
-extern crate microgui;
+extern crate micro_gui;
 
-use microgui::GUI;
-use microgui::buffer::Buffer;
-use microgui::native::Renderer;
-use microgui::window::Window;
-use microgui::widgets::demo::DemoWidget;
+use micro_gui::GUI;
+use micro_gui::buffer::Buffer;
+use micro_gui::native::Renderer;
+use micro_gui::window::Window;
+use micro_gui::widgets::demo::DemoWidget;
 
 const WIDTH: usize = 640;
 const HEIGHT: usize = 480; 
@@ -52,5 +52,4 @@ fn main() {
 
         if !running { break; }
     }
-
 }
