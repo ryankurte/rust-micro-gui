@@ -1,11 +1,11 @@
 
 use std::vec::Vec;
 
-use types::*;
-use core::buffer::{Buff};
-use core::window::{Window, OnEvent, OnLoad, OnUnload};
+use crate::types::*;
+use crate::core::buffer::{Buff};
+use crate::core::window::{Window, OnEvent, OnLoad, OnUnload};
 
-use graphics::Graphics;
+use crate::graphics::Graphics;
 
 /// Top level Gui object
 pub struct Gui<'a, Pixel> {

@@ -1,8 +1,8 @@
 
 
-pub use types::pixel;
-pub use gui::Gui;
-pub use core::buffer::{Buffer, Buff};
-pub use core::layer::Layer;
-pub use core::window::{Window, OnEvent, OnLoad, OnUnload};
+pub use crate::types::pixel;
+pub use crate::gui::Gui;
+pub use crate::core::buffer::{Buffer, Buff};
+pub use crate::core::layer::Layer;
+pub use crate::core::window::{Window, OnEvent, OnLoad, OnUnload};
 

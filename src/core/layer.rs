@@ -1,9 +1,9 @@
 
 use std::*;
 
-use core::buffer::Buff;
-use types::rect::Rect;
-use graphics::{Graphics, Renderable};
+use crate::core::buffer::Buff;
+use crate::types::rect::Rect;
+use crate::graphics::{Graphics, Renderable};
 
 /// Layers combine graphics functions to provide reusable blocks for rendering
 pub struct Layer<'a, Pixel> {

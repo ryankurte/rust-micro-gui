@@ -6,7 +6,7 @@ use std::*;
 
 use std::marker::PhantomData;
 
-use types::pixel::{PixelBW, PixelRGB24};
+use crate::types::pixel::{PixelBW, PixelRGB24};
 
 /// Buff trait encompasses methods required for a graphics buffer
 pub trait Buff<Pixel> {
@@ -150,7 +150,7 @@ impl <'a, Pixel>fmt::Display for Buffer<'a, Pixel> {
 mod tests {
     use super::*;
 
-    use types::pixel::*;
+    use crate::types::pixel::*;
 
     const WIDTH: usize = 16;
     const HEIGHT: usize = 16;

@@ -1,10 +1,10 @@
 
-use core::buffer::Buff;
+use crate::core::buffer::Buff;
 
-use types::pixel::*;
-use types::rect::Rect;
-use types::point::Point;
-use graphics::{Graphics, Renderable};
+use crate::types::pixel::*;
+use crate::types::rect::Rect;
+use crate::types::point::Point;
+use crate::graphics::{Graphics, Renderable};
 
 pub struct DemoWidget {
 

@@ -6,12 +6,12 @@
 use std::*;
 
 
-use types::*;
+use crate::types::*;
 
 use super::buffer::Buff;
 use super::layer::Layer;
 
-use graphics::{Graphics, Renderable};
+use crate::graphics::{Graphics, Renderable};
 
 /// Window object contains renderable layers and handles events
 pub struct Window<'a, Pixel> {

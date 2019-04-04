@@ -7,9 +7,9 @@
 use std::marker::PhantomData;
 
 
-use core::buffer::Buff;
-use types::rect::Rect;
-use types::point::Point;
+use crate::core::buffer::Buff;
+use crate::types::rect::Rect;
+use crate::types::point::Point;
 
 /// Renderable trait implemented by types that can render themselves
 /// For example, widgets should implement the renderable trait to be bound into layers
