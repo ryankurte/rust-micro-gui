@@ -1,6 +1,6 @@
 //! Events for ugui interaction
 //!
-//! Copyright 2017 Ryan Kurte
+//! Copyright 2019 Ryan Kurte
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Event {
@@ -10,9 +10,5 @@ pub enum Event {
     Right,
     Select,
     Back,
-    Click{
-        x: usize,
-        y: usize,
-    },
+    Click { x: usize, y: usize },
 }
-

@@ -1,6 +1,6 @@
 //! Buffer module creates a read write buffer from a reference to a data array.
 //!
-//! Copyright 2017 Ryan Kurte
+//! Copyright 2019 Ryan Kurte
 
 use std::*;
 
@@ -32,21 +32,35 @@ pub struct Buffer<'a, Pixel> {
     _pixel: PhantomData<Pixel>,
 }
 
-impl <'a, Pixel> Buffer <'a, Pixel> {
+impl<'a, Pixel> Buffer<'a, Pixel> {
     pub fn data(&self) -> &[u8] {
         self.data
     }
 }
 
-impl <'a> Buffer <'a, PixelBW> {
+impl<'a> Buffer<'a, PixelBW> {
     // Create a new black and white buffer
-    pub fn new(width: usize, height: usize, porch_bytes: usize, trailer_bytes: usize, data: &'a mut [u8]) -> Self {
+    pub fn new(
+        width: usize,
+        height: usize,
+        porch_bytes: usize,
+        trailer_bytes: usize,
+        data: &'a mut [u8],
+    ) -> Self {
         let line_width_bytes = porch_bytes + width / 8 + trailer_bytes;
-        return Self{width, height, porch_bytes, trailer_bytes, line_width_bytes, data, _pixel: PhantomData}
+        return Self {
+            width,
+            height,
+            porch_bytes,
+            trailer_bytes,
+            line_width_bytes,
+            data,
+            _pixel: PhantomData,
+        };
     }
 }
 
-impl <'a> Buff<PixelBW> for Buffer <'a, PixelBW> {
+impl<'a> Buff<PixelBW> for Buffer<'a, PixelBW> {
     /// Black and white mode pixel set function
     fn set(&mut self, x: usize, y: usize, p: &PixelBW) {
         let index = self.line_width_bytes * y + self.porch_bytes + x / 8;
@@ -65,11 +79,11 @@ impl <'a> Buff<PixelBW> for Buffer <'a, PixelBW> {
         let mask = 1 << (7 - x % 8);
 
         if (self.data[index as usize] & mask) != 0 {
-             return true;
+            return true;
         } else {
             return false;
         }
-    }  
+    }
 
     /// Black and White mode buffer clear function
     fn clear(&mut self, p: &PixelBW) {
@@ -78,7 +92,7 @@ impl <'a> Buff<PixelBW> for Buffer <'a, PixelBW> {
                 self.set(x, y, p);
             }
         }
-    } 
+    }
 
     /// Fetch the buffer size in pixels
     fn size(&self) -> (usize, usize) {
@@ -86,20 +100,33 @@ impl <'a> Buff<PixelBW> for Buffer <'a, PixelBW> {
     }
 }
 
-impl <'a> Buffer <'a, PixelRGB24> {
+impl<'a> Buffer<'a, PixelRGB24> {
     // Create a new rgb24 buffer
-    pub fn new(width: usize, height: usize, porch_bytes: usize, trailer_bytes: usize, data: &'a mut [u8]) -> Self {
+    pub fn new(
+        width: usize,
+        height: usize,
+        porch_bytes: usize,
+        trailer_bytes: usize,
+        data: &'a mut [u8],
+    ) -> Self {
         let line_width_bytes = porch_bytes + width * 3 + trailer_bytes;
-        return Self{width, height, porch_bytes, trailer_bytes, line_width_bytes, data, _pixel: PhantomData}
+        return Self {
+            width,
+            height,
+            porch_bytes,
+            trailer_bytes,
+            line_width_bytes,
+            data,
+            _pixel: PhantomData,
+        };
     }
 }
 
-impl <'a> Buff<PixelRGB24> for Buffer <'a, PixelRGB24> {
-
+impl<'a> Buff<PixelRGB24> for Buffer<'a, PixelRGB24> {
     /// RGB24 mode pixel set function
     fn set(&mut self, x: usize, y: usize, p: &PixelRGB24) {
         let index: usize = self.line_width_bytes * y + x * 3 + self.porch_bytes;
-        
+
         self.data[index + 0] = p.r;
         self.data[index + 1] = p.g;
         self.data[index + 2] = p.b;
@@ -109,10 +136,11 @@ impl <'a> Buff<PixelRGB24> for Buffer <'a, PixelRGB24> {
     fn get(&self, x: usize, y: usize) -> PixelRGB24 {
         let index: usize = self.line_width_bytes * y + x * 3 + self.porch_bytes;
 
-        return PixelRGB24{
+        return PixelRGB24 {
             r: self.data[index + 0],
             g: self.data[index + 1],
-            b: self.data[index + 2]} 
+            b: self.data[index + 2],
+        };
     }
 
     /// RGB24 mode buffer clear function
@@ -130,20 +158,23 @@ impl <'a> Buff<PixelRGB24> for Buffer <'a, PixelRGB24> {
     }
 }
 
-
 /// Format implementation for the buffer
-impl <'a, Pixel>fmt::Display for Buffer<'a, Pixel> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { 
-        write!(f, "[width: {}px height: {}px porch: {}B trailer: {}B line_width: {}B Data:\n", 
-        self.width, self.height, self.porch_bytes, self.trailer_bytes, self.line_width_bytes).unwrap();
+impl<'a, Pixel> fmt::Display for Buffer<'a, Pixel> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "[width: {}px height: {}px porch: {}B trailer: {}B line_width: {}B Data:\n",
+            self.width, self.height, self.porch_bytes, self.trailer_bytes, self.line_width_bytes
+        )
+        .unwrap();
         for l in 0..self.height {
             let start: usize = l * self.line_width_bytes;
-            let end:   usize = start + self.line_width_bytes - 1;
+            let end: usize = start + self.line_width_bytes - 1;
             write!(f, "\t\t{:?}\n", &self.data[start..end]).unwrap();
         }
         write!(f, "\t]\n").unwrap();
         Ok(())
-     }
+    }
 }
 
 #[cfg(test)]
@@ -235,11 +266,10 @@ mod tests {
                 assert_eq!(buffer.get(x, y), black);
 
                 let index = (y * Y + x) * 3;
-                assert_eq!(buffer.data[index+0], 0x00);
-                assert_eq!(buffer.data[index+1], 0x00);
-                assert_eq!(buffer.data[index+2], 0x00);
+                assert_eq!(buffer.data[index + 0], 0x00);
+                assert_eq!(buffer.data[index + 1], 0x00);
+                assert_eq!(buffer.data[index + 2], 0x00);
             }
         }
     }
 }
-

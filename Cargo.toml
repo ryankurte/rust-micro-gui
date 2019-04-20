@@ -9,20 +9,28 @@ license = "MIT"
 
 [features]
 default = [ "sdl" ]
-sdl = ["sdl2"]
+sdl = ["sdl2", "structopt", "quote"]
 
 
 [dependencies]
+structopt = { version = "0.2.15", optional = true }
+quote = { version = "0.6.12", optional = true }
+proc-macro2 = "0.4.27"
 
 
 [dependencies.sdl2]
 version = "0.30"
 optional = true
 default-features = false
-features = ["image"]
+features = ["image", "ttf"]
 
-[[bin]]
-name = "micro-gui-example"
-path = "src/bin/example.rs"
+
+[[example]]
+name = "rgb"
+path = "src/examples/rgb.rs"
 required-features = [ "sdl2" ]
 
+[[example]]
+name = "bw"
+path = "src/examples/bw.rs"
+required-features = [ "sdl2" ]

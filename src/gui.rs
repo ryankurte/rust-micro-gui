@@ -1,25 +1,24 @@
-
 use std::vec::Vec;
 
+use crate::core::buffer::Buff;
+use crate::core::window::{OnEvent, OnLoad, OnUnload, Window};
 use crate::types::*;
-use crate::core::buffer::{Buff};
-use crate::core::window::{Window, OnEvent, OnLoad, OnUnload};
 
 use crate::graphics::Graphics;
 
 /// Top level Gui object
 pub struct Gui<'a, Pixel> {
     graphics: Graphics<Pixel>,
-    windows: Vec<&'a mut Window<'a, Pixel>>
+    windows: Vec<&'a mut Window<'a, Pixel>>,
 }
 
-impl <'a, Pixel> Gui <'a, Pixel> {
+impl<'a, Pixel> Gui<'a, Pixel> {
     /// Create a new Gui instance of the provided size with the specified buffer
     pub fn new(w: usize, h: usize) -> Self {
         let graphics = Graphics::new(0, 0, w, h);
         let windows = Vec::new();
 
-        return Self{graphics, windows};
+        return Self { graphics, windows };
     }
 
     /// Push a window to the top of the window stack
@@ -35,7 +34,7 @@ impl <'a, Pixel> Gui <'a, Pixel> {
         let mut window = self.windows.pop();
         match window {
             Some(ref mut w) => w.on_unload(),
-            None => ()
+            None => (),
         }
         return window;
     }
@@ -44,9 +43,11 @@ impl <'a, Pixel> Gui <'a, Pixel> {
     pub fn render(&mut self, buff: &mut Buff<Pixel>) {
         let windows = self.windows.as_mut_slice();
         let len = windows.len();
-        if len <= 0 { return; }
+        if len <= 0 {
+            return;
+        }
 
-        let active = &mut windows[len-1];
+        let active = &mut windows[len - 1];
         active.render(&mut self.graphics, buff);
     }
 
@@ -54,9 +55,11 @@ impl <'a, Pixel> Gui <'a, Pixel> {
     pub fn event(&mut self, e: &events::Event) {
         let windows = self.windows.as_mut_slice();
         let len = windows.len();
-        if len <= 0 { return; }
+        if len <= 0 {
+            return;
+        }
 
-        let active = &mut windows[len-1];
+        let active = &mut windows[len - 1];
         active.on_event(e);
     }
 }

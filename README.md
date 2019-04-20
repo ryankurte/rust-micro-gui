@@ -16,4 +16,4 @@ A lightweight GUI for embedded systems, intended to provide a reasonably high le
 ## Usage
 
 
-- `apt install libsdl2-dev libsdl2-image-dev` to install SDL2 for local renderer support
+- `apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev` to install SDL2 for local renderer support

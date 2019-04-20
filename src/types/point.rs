@@ -1,6 +1,6 @@
 //! Point represents a point in 2d space
 //!
-//! Copyright 2017 Ryan Kurte
+//! Copyright 2019 Ryan Kurte
 
 /// Point in 2d space
 #[derive(Clone, Copy, Default, Debug, PartialEq)]
@@ -10,6 +10,7 @@ pub struct Point {
 }
 
 impl Point {
-    pub fn new(x: usize, y: usize) -> Point { Point{x, y} }
+    pub fn new(x: usize, y: usize) -> Point {
+        Point { x, y }
+    }
 }
-

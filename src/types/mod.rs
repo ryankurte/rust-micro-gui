@@ -1,6 +1,6 @@
 //! Types module defines types for use across ugui implementation
 //!
-//! Copyright 2017 Ryan Kurte
+//! Copyright 2019 Ryan Kurte
 
 pub mod pixel;
 pub use self::pixel::{PixelBW, PixelRGB24};
@@ -10,6 +10,3 @@ pub mod rect;
 pub use self::rect::Rect;
 pub mod events;
 pub use self::events::Event;
-
-
-

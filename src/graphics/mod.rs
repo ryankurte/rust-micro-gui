@@ -1,15 +1,13 @@
 //! Graphics module provides underlying rendering functions over a generic buffer
 //! This is used by components or widgets for rendering purposes.
 //!
-//! Copyright 2017 Ryan Kurte
-
+//! Copyright 2019 Ryan Kurte
 
 use std::marker::PhantomData;
 
-
 use crate::core::buffer::Buff;
-use crate::types::rect::Rect;
 use crate::types::point::Point;
+use crate::types::rect::Rect;
 
 /// Renderable trait implemented by types that can render themselves
 /// For example, widgets should implement the renderable trait to be bound into layers
@@ -23,7 +21,6 @@ pub trait Sprite<Pixel> {
     fn size(&self) -> (usize, usize);
 }
 
-
 /// Graphics context used for rendering components
 /// This includes offsets and dimensions to shift rendering scopes
 pub struct Graphics<Pixel> {
@@ -34,10 +31,16 @@ pub struct Graphics<Pixel> {
     _pixel: PhantomData<Pixel>,
 }
 
-impl <Pixel>Graphics<Pixel> {
+impl<Pixel> Graphics<Pixel> {
     /// New creates a new graphcs context with the provided offsets and limits
     pub fn new(x: usize, y: usize, w: usize, h: usize) -> Self {
-        return Self{x, y, w, h, _pixel: PhantomData};
+        return Self {
+            x,
+            y,
+            w,
+            h,
+            _pixel: PhantomData,
+        };
     }
 
     /// Set wraps a buffer in a graphics context to shift rendering functions
@@ -64,20 +67,24 @@ impl <Pixel>Graphics<Pixel> {
     }
 
     fn limit(min: usize, max: usize, actual: usize) -> usize {
-        if actual > max { return max }
-        if actual < min { return min }
-        return actual
+        if actual > max {
+            return max;
+        }
+        if actual < min {
+            return min;
+        }
+        return actual;
     }
 
     /// Draws a line between two points with the provided pixel style
     pub fn draw_line(&self, buf: &mut Buff<Pixel>, p1: Point, p2: Point, p: &Pixel) {
         // Bresenham's line algorithm (https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm), implementation from:
-	    // https://www.opengl.org/discussion_boards/showthread.php/168761-Drawing-Line-Bresenhem-midpoint-algorithm
+        // https://www.opengl.org/discussion_boards/showthread.php/168761-Drawing-Line-Bresenhem-midpoint-algorithm
 
         // Create local mutable copies of the required points
         let mut a = p1;
         let mut b = p2;
-        
+
         // Limit points to drawable space
         //a.x = self::limit(0, self.w, a.x);
         //a.y = self::limit(0, self.h, a.y);
@@ -109,9 +116,10 @@ impl <Pixel>Graphics<Pixel> {
                 }
                 a.x = (a.x as isize + sign_x) as usize;
 
-                if a.x == b.x { break; }
+                if a.x == b.x {
+                    break;
+                }
             }
-            
         } else {
             let mut accum = delta_y / 2;
             loop {
@@ -120,11 +128,13 @@ impl <Pixel>Graphics<Pixel> {
                 accum -= delta_x;
                 if accum < 0 {
                     accum += delta_y;
-                     a.x = (a.x as isize + sign_x) as usize;
+                    a.x = (a.x as isize + sign_x) as usize;
                 }
                 a.y = (a.y as isize + sign_y) as usize;
 
-                if a.y == b.y { break; }
+                if a.y == b.y {
+                    break;
+                }
             }
         }
     }
@@ -153,9 +163,9 @@ impl <Pixel>Graphics<Pixel> {
     /// Draws a polyline connecting a list of points
     pub fn draw_polyline(&self, b: &mut Buff<Pixel>, points: &[Point], p: &Pixel) {
         let len = points.len();
-        for i in 0..len-1 {
+        for i in 0..len - 1 {
             let p1 = points[i];
-            let p2 = points[i+1];
+            let p2 = points[i + 1];
             self.draw_line(b, p1, p2, p);
         }
     }
@@ -163,15 +173,15 @@ impl <Pixel>Graphics<Pixel> {
     /// Draws an ellipse to fill the provided rectangle
     pub fn draw_ellipse(&self, buf: &mut Buff<Pixel>, r: Rect, p: &Pixel) {
         // Implementation also from:
-	    // https://www.opengl.org/discussion_boards/showthread.php/168761-Drawing-Line-Bresenhem-midpoint-algorithm
+        // https://www.opengl.org/discussion_boards/showthread.php/168761-Drawing-Line-Bresenhem-midpoint-algorithm
 
         let left = (r.x) as isize;
-	    let right = (r.x + r.w) as isize;
-	    let top = (r.y) as isize;
-	    let bottom = (r.y + r.h) as isize;
+        let right = (r.x + r.w) as isize;
+        let top = (r.y) as isize;
+        let bottom = (r.y + r.h) as isize;
 
         let a = ((right - left + 1) / 2) as isize;
-	    let b = ((bottom - top + 1) / 2) as isize;
+        let b = ((bottom - top + 1) / 2) as isize;
 
         if a != 0 && b != 0 {
             let a2 = (a * a) as isize;
@@ -186,9 +196,9 @@ impl <Pixel>Graphics<Pixel> {
             let mut t = b2 - two_a2 * ((b * 2) - 1);
 
             self.set(buf, (right + x - a) as usize, (bottom + y - b) as usize, p);
-	        self.set(buf, (left - x + a) as usize, (bottom + y - b) as usize, p);
-	        self.set(buf, (left - x + a) as usize, (top - y + b) as usize, p);
-	        self.set(buf, (right + x - a) as usize, (top - y + b) as usize, p);
+            self.set(buf, (left - x + a) as usize, (bottom + y - b) as usize, p);
+            self.set(buf, (left - x + a) as usize, (top - y + b) as usize, p);
+            self.set(buf, (right + x - a) as usize, (top - y + b) as usize, p);
 
             loop {
                 if s < 0 {
@@ -207,13 +217,14 @@ impl <Pixel>Graphics<Pixel> {
                 }
 
                 self.set(buf, (right + x - a) as usize, (bottom + y - b) as usize, p);
-	            self.set(buf, (left - x + a) as usize, (bottom + y - b) as usize, p);
-	            self.set(buf, (left - x + a) as usize, (top - y + b) as usize, p);
-	            self.set(buf, (right + x - a) as usize, (top - y + b) as usize, p);
+                self.set(buf, (left - x + a) as usize, (bottom + y - b) as usize, p);
+                self.set(buf, (left - x + a) as usize, (top - y + b) as usize, p);
+                self.set(buf, (right + x - a) as usize, (top - y + b) as usize, p);
 
-                if y <= 0 { break; }
+                if y <= 0 {
+                    break;
+                }
             }
-
         }
     }
 

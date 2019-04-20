@@ -1,4 +1,3 @@
-
 pub mod prelude;
 
 pub mod types;
@@ -13,4 +12,3 @@ pub mod widgets;
 
 #[cfg(feature = "sdl")]
 pub mod native;
-

@@ -1,43 +1,51 @@
 //! ugui example application
 //!
-//! Copyright 2017 Ryan Kurte
-
+//! Copyright 2019 Ryan Kurte
 
 extern crate micro_gui;
 
+use micro_gui::native::Renderer;
 use micro_gui::prelude::*;
 use micro_gui::types::pixel::*;
-use micro_gui::native::Renderer;
-
 
 use micro_gui::widgets::demo::DemoWidget;
 
-const WIDTH: usize = 640;
-const HEIGHT: usize = 480; 
-const SIZE: usize = WIDTH * HEIGHT * 3;
+extern crate structopt;
+use structopt::StructOpt;
+
+pub mod common;
 
 type Pixel = PixelRGB24;
 
 #[cfg(feature = "sdl")]
 fn main() {
+    let config = common::Config::from_args();
+
+    let size = config.width * config.height * 3;
+
+    println!("config: {:?}", config);
 
     // Create backing data
-    let mut data: [u8; SIZE] = [0xff; SIZE];
+    let mut data = vec![0u8; size];
     let data_slice = &mut data[..];
 
     // Create buffer to wrap data
-    let mut buffer = Buffer::<Pixel>::new(WIDTH, HEIGHT, 0, 0, data_slice);
+    let mut buffer = Buffer::<Pixel>::new(config.width, config.height, 0, 0, data_slice);
 
     let mut demo = DemoWidget::new();
-    let mut window = Window::<Pixel>::new(WIDTH, HEIGHT, Some(&mut demo));
+    let mut window = Window::<Pixel>::new(config.width, config.height, Some(&mut demo));
 
     // Create gui instance that consumes buffer
-    let mut gui = Gui::new(WIDTH, HEIGHT);
+    let mut gui = Gui::new(config.width, config.height);
 
     gui.push_window(&mut window);
 
     // Native renderer allows local display
-    let mut native = Renderer::<Pixel>::new(&"Rust microgui example", WIDTH as u32, HEIGHT as u32);
+    let mut native = Renderer::<Pixel>::new(
+        &"Rust micro-gui RGB24 example",
+        config.width as u32,
+        config.height as u32,
+    );
 
     println!("Rust microgui running!");
 
@@ -52,6 +60,8 @@ fn main() {
             println!("Event: {:?}", e);
         }
 
-        if !running { break; }
+        if !running {
+            break;
+        }
     }
 }
