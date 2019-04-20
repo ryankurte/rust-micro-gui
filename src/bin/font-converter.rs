@@ -75,7 +75,7 @@ fn main() -> Result<(), String> {
 
     let font = ttf_context.load_font(&config.font, config.size)?;
 
-    let mut canvases = Vec::with_capacity((config.end - config.start) as usize);
+    let mut surfaces = Vec::with_capacity((config.end - config.start) as usize);
 
     let mut max_width = 0;
     let mut max_height = 0;
@@ -87,7 +87,7 @@ fn main() -> Result<(), String> {
         // Render character into partial surface
         let s = font
             .render_char(c)
-            .solid(Color::RGBA(255, 255, 255, 255))
+            .solid(Color::RGBA(255, 0, 255, 255))
             .map_err(|e| e.to_string())?;
 
         if s.width() > max_width {
@@ -98,17 +98,10 @@ fn main() -> Result<(), String> {
             max_height = s.height();
         }
 
-        let mut c = s.into_canvas().unwrap();
-        c.present();
-        let s = c.surface();
-
-        // For some reason render_char does not appear to do anything...
-        let pixels = c.read_pixels(s.rect(), s.pixel_format_enum()).unwrap();
-        println!("px: {:?}", pixels);
-
-        canvases.push(c);
+        surfaces.push(s);
     }
 
+    // Generate bitmaps from surfaces
     let padded_width = if max_width % 8 != 0 {
         max_width / 8 + 1
     } else {
@@ -118,13 +111,35 @@ fn main() -> Result<(), String> {
     let char_size = padded_width * max_height as usize;
 
     let mut chars = Vec::with_capacity((config.end - config.start) as usize);
+    
+    
+    let surface = Surface::new(max_width, max_height, PixelFormatEnum::Index8).unwrap();
+    let mut canvas = surface.into_canvas().unwrap();
+    let texture_creator = canvas.texture_creator();
 
-    // Generate bitmaps from surfaces
-    for c in canvases {
-        let s = c.surface();
+    // Render out these surfaces
+    for s in surfaces {
 
-        s.with_lock(|pixels| println!("{:?}", pixels) );
+        // Generate texture from surface
+        let texture = texture_creator.create_texture_from_surface(&s)
+        .map_err(|e| e.to_string())?;
 
+        // Render into canvas
+        canvas.set_draw_color(Color::RGBA(0, 0, 0, 0));
+        canvas.clear();
+        canvas.copy(&texture, None, None)?;
+        canvas.present();
+
+        // For some reason render_char does not appear to do anything...
+        let pixels = canvas.read_pixels(s.rect(), s.pixel_format_enum()).unwrap();
+        println!("px: {:?}", pixels);
+
+        // Always zeros..?!@
+        let s = canvas.surface();
+        s.with_lock(|pixels| println!("pk: {:?}", pixels) );
+
+
+        // Convert into char object
         let mut data = vec![0u8; char_size as usize];
         let d = &mut data[..];
 
@@ -194,10 +209,10 @@ fn main() -> Result<(), String> {
     writeln!(f, "{}", font_map).map_err(|e| e.to_string())?;
 
     // Format output
-    Command::new("cargo fmt")
-        .args(&["--", &config.output])
-        .output()
-        .map_err(|e| e.to_string())?;
+    //Command::new("cargo fmt")
+    //    .args(&["--", &config.output])
+    //    .output()
+    //    .map_err(|e| e.to_string())?;
 
     Ok(())
 }
