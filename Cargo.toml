@@ -5,6 +5,7 @@ repository = "https://github.com/ryankurte/rust-micro-gui"
 version = "0.1.0"
 authors = ["Ryan Kurte <ryankurte@gmail.com>"]
 edition = "2018"
+license = "MIT"
 
 [features]
 default = [ "sdl" ]
